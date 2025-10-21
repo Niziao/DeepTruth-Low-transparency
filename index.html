@@ -91,7 +91,7 @@
         }
         
         .left-panel {
-            flex: 0 0 45%;
+            flex: 0 0 50%;
             display: flex;
             flex-direction: column;
         }
@@ -100,7 +100,6 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 30px;
         }
         
         .news-number {
@@ -153,43 +152,20 @@
             color: #888;
         }
         
-        .judgment-area, .thinking-area {
+        .judgment-area {
             border: 1px solid #e0e0e0;
             border-radius: 8px;
-            padding: 20px;
+            padding: 40px 20px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
         }
         
         .judgment-result {
             font-size: 1.1em;
             line-height: 1.6;
-        }
-        
-        .thinking-title {
-            font-size: 1.3em;
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: #333;
-        }
-        
-        .thinking-list {
-            list-style-type: none;
-            padding-left: 0;
-            margin-bottom: 0;
-        }
-        
-        .thinking-list li {
-            margin-bottom: 12px;
-            padding-left: 20px;
-            position: relative;
-            line-height: 1.6;
-        }
-        
-        .thinking-list li:before {
-            content: "•";
-            position: absolute;
-            left: 10px;
-            color: #333;
-            font-size: 1.2em;
         }
         
         .footer-controls {
@@ -300,19 +276,10 @@
                 </div>
             </div>
             
-            <!-- 右侧：判断结果和思索过程 -->
+            <!-- 右侧：判断结果 -->
             <div class="right-panel">
                 <div class="judgment-area">
                     <div class="judgment-result" id="judgmentResult">DeepTruth判断它是正确的</div>
-                </div>
-                <div class="thinking-area">
-                    <div class="thinking-title">思索过程如下：</div>
-                    <ul class="thinking-list" id="thinkingList">
-                        <li>首先，新闻故事是由算法编写和传播的。</li>
-                        <li>其次，本文中的引用无法核实。</li>
-                        <li>且图片无法通过反向搜索进行验证。</li>
-                        <li>最后，这个新闻故事的内容与其他新闻来源不一致，故判断为假。</li>
-                    </ul>
                 </div>
             </div>
         </div>
@@ -341,7 +308,6 @@
             const newsSource = document.getElementById('newsSource');
             const newsTime = document.getElementById('newsTime');
             const judgmentResult = document.getElementById('judgmentResult');
-            const thinkingList = document.getElementById('thinkingList');
             
             // 所有新闻数据 - 不包含真假属性
             const allNewsItems = [
@@ -403,37 +369,6 @@
                 }
             ];
             
-            // 思索过程库 - 保持原来的2个思索过程
-            const trueReasoning = [
-                [
-                    "首先，作者是经过验证的专业新闻记者。",
-                    "其次，文中引用的数据可在官方统计年鉴或机构报告中查到。",
-                    "再者，配图经过反向搜索，确实对应同一事件的照片。",
-                    "最后，该新闻内容与多家独立新闻媒体报道相一致，故判断为真。"
-                ],
-                [
-                    "首先，报道的事实与其他来源一致。",
-                    "其次，它的写作风格坚持新闻写作的专业风格。",
-                    "再者，作者是有信誉的新闻记者。",
-                    "最后，这个URL链接到一个有信誉的、知名的新闻网站，故判断为真。"
-                ]
-            ];
-            
-            const falseReasoning = [
-                [
-                    "首先，新闻故事是由算法编写和传播的。",
-                    "其次，本文中的引用无法核实。",
-                    "且图片无法通过反向搜索进行验证。",
-                    "最后，这个新闻故事的内容与其他新闻来源不一致，故判断为假。"
-                ],
-                [
-                    "首先，从其他来源找不到同一问题的报道。",
-                    "其次，它的写作风格不坚持新闻写作的专业风格。",
-                    "再者，在网上找不到关于作者的任何信息。",
-                    "最后，文章中有多个标点、拼写和语法错误，故判断为假。"
-                ]
-            ];
-            
             let currentNewsIndex = 0;
             let selectedNewsItems = [];
             
@@ -461,33 +396,18 @@
                 const indices = [0, 1, 2, 3];
                 shuffleArray(indices);
                 
-                // 创建思索过程副本并打乱顺序
-                const availableTrueReasoning = [...trueReasoning];
-                const availableFalseReasoning = [...falseReasoning];
-                shuffleArray(availableTrueReasoning);
-                shuffleArray(availableFalseReasoning);
-                
                 // 前两个设为真，后两个设为假
                 for (let i = 0; i < 2; i++) {
                     selectedNewsItems[indices[i]].isTrue = true;
-                    // 确保两个真新闻使用不同的思索过程
-                    selectedNewsItems[indices[i]].reasoning = availableTrueReasoning[i];
                 }
                 
                 for (let i = 2; i < 4; i++) {
                     selectedNewsItems[indices[i]].isTrue = false;
-                    // 确保两个假新闻使用不同的思索过程
-                    selectedNewsItems[indices[i]].reasoning = availableFalseReasoning[i-2];
                 }
                 
                 console.log("本次体验的新闻真假分配:");
                 selectedNewsItems.forEach((news, index) => {
                     console.log(`新闻${index+1}: ${news.title} - ${news.isTrue ? '真' : '假'}`);
-                });
-                
-                console.log("思索过程分配:");
-                selectedNewsItems.forEach((news, index) => {
-                    console.log(`新闻${index+1}: ${news.isTrue ? '真' : '假'} - 思索过程: ${news.reasoning[0].substring(0, 20)}...`);
                 });
             }
             
@@ -508,6 +428,8 @@
                 newsTitle.textContent = news.title;
                 newsSource.textContent = news.source;
                 newsTime.textContent = news.time;
+                
+                // 更新判断结果，无颜色
                 judgmentResult.textContent = news.isTrue ? 
                     "DeepTruth判断它是真实的" : "DeepTruth判断它是虚假的";
                 
@@ -527,15 +449,6 @@
                 };
                 
                 newsImageContainer.appendChild(img);
-                
-                // 清空并重新填充思索过程列表
-                thinkingList.innerHTML = '';
-                
-                news.reasoning.forEach(reason => {
-                    const li = document.createElement('li');
-                    li.textContent = reason;
-                    thinkingList.appendChild(li);
-                });
                 
                 // 如果是最后一个新闻，更改按钮文本
                 if (currentNewsIndex === selectedNewsItems.length - 1) {
